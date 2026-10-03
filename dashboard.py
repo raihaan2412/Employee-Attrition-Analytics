@@ -2,21 +2,11 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-
-# ============================================================
-# PAGE CONFIGURATION
-# ============================================================
-
 st.set_page_config(
     page_title="Employee Attrition Analytics",
     page_icon="👥",
     layout="wide"
 )
-
-
-# ============================================================
-# CUSTOM THEME
-# ============================================================
 
 st.markdown(
     """
@@ -99,10 +89,6 @@ st.markdown(
 )
 
 
-# ============================================================
-# LOAD DATA
-# ============================================================
-
 @st.cache_data
 def load_data():
     df = pd.read_csv("data/employee_attrition_cleaned.csv")
@@ -111,10 +97,6 @@ def load_data():
 
 df = load_data()
 
-
-# ============================================================
-# TITLE
-# ============================================================
 
 st.title("👥 Employee Attrition Analytics")
 
@@ -127,11 +109,6 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-
-# ============================================================
-# SIDEBAR FILTERS
-# ============================================================
-
 st.sidebar.header("🔎 Dashboard Filters")
 
 # Department
@@ -143,7 +120,7 @@ selected_departments = st.sidebar.multiselect(
     default=department_options
 )
 
-# Job Role
+
 job_role_options = sorted(df["JobRole"].dropna().unique())
 
 selected_job_roles = st.sidebar.multiselect(
@@ -152,7 +129,6 @@ selected_job_roles = st.sidebar.multiselect(
     default=job_role_options
 )
 
-# Overtime
 overtime_options = sorted(df["OverTime"].dropna().unique())
 
 selected_overtime = st.sidebar.multiselect(
@@ -161,7 +137,7 @@ selected_overtime = st.sidebar.multiselect(
     default=overtime_options
 )
 
-# Tenure
+
 tenure_options = [
     "0-2 Years",
     "3-5 Years",
@@ -175,22 +151,12 @@ selected_tenure = st.sidebar.multiselect(
     default=tenure_options
 )
 
-
-# ============================================================
-# APPLY FILTERS
-# ============================================================
-
 filtered_df = df[
     df["Department"].isin(selected_departments)
     & df["JobRole"].isin(selected_job_roles)
     & df["OverTime"].isin(selected_overtime)
     & df["TenureBand"].isin(selected_tenure)
 ].copy()
-
-
-# ============================================================
-# KPI CALCULATIONS
-# ============================================================
 
 total_employees = len(filtered_df)
 
@@ -213,11 +179,6 @@ avg_monthly_income = (
     if total_employees > 0
     else 0
 )
-
-
-# ============================================================
-# KPI CARDS
-# ============================================================
 
 st.subheader("📊 Workforce Overview")
 
@@ -268,10 +229,6 @@ with kpi4:
     )
 
 
-# ============================================================
-# NO DATA CHECK
-# ============================================================
-
 if filtered_df.empty:
 
     st.warning(
@@ -280,11 +237,6 @@ if filtered_df.empty:
     )
 
     st.stop()
-
-
-# ============================================================
-# CHART 1 — ATTRITION BY DEPARTMENT
-# ============================================================
 
 department_data = (
     filtered_df
@@ -323,11 +275,6 @@ fig_department.update_layout(
     yaxis_title="Attrition Rate (%)",
     xaxis_title="Department"
 )
-
-
-# ============================================================
-# CHART 2 — ATTRITION BY JOB ROLE
-# ============================================================
 
 role_data = (
     filtered_df
@@ -372,11 +319,6 @@ fig_role.update_layout(
     xaxis_title="Attrition Rate (%)",
     yaxis_title="Job Role"
 )
-
-
-# ============================================================
-# CHART 3 — ATTRITION BY TENURE
-# ============================================================
 
 tenure_data = (
     filtered_df
@@ -423,11 +365,6 @@ fig_tenure.update_layout(
     yaxis_title="Attrition Rate (%)",
     xaxis_title="Tenure"
 )
-
-
-# ============================================================
-# CHART 4 — ATTRITION BY INCOME BAND
-# ============================================================
 
 income_data = (
     filtered_df
@@ -482,11 +419,6 @@ fig_income.update_layout(
     xaxis_title="Income Band"
 )
 
-
-# ============================================================
-# CHART 5 — ATTRITION BY OVERTIME
-# ============================================================
-
 overtime_data = (
     filtered_df
     .groupby("OverTime")
@@ -524,11 +456,6 @@ fig_overtime.update_layout(
     yaxis_title="Attrition Rate (%)",
     xaxis_title="Overtime"
 )
-
-
-# ============================================================
-# CHART 6 — ATTRITION BY JOB SATISFACTION
-# ============================================================
 
 satisfaction_data = (
     filtered_df
@@ -568,10 +495,6 @@ fig_satisfaction.update_layout(
     yaxis_title="Attrition Rate (%)"
 )
 
-
-# ============================================================
-# DISPLAY CHARTS
-# ============================================================
 
 st.subheader("📈 Attrition Analysis")
 
@@ -619,14 +542,8 @@ with row3_col2:
         width="stretch"
     )
 
-
-# ============================================================
-# DYNAMIC KEY INSIGHTS
-# ============================================================
-
 st.subheader("💡 Key Insights")
 
-# Department insight
 department_rates = (
     filtered_df
     .groupby("Department")["AttritionFlag"]
@@ -648,7 +565,7 @@ else:
     lowest_department_rate = 0
 
 
-# Tenure insight
+
 tenure_rates = (
     filtered_df
     .groupby("TenureBand")["AttritionFlag"]
@@ -663,8 +580,6 @@ else:
     highest_tenure = "N/A"
     highest_tenure_rate = 0
 
-
-# Overtime insight
 overtime_rates = (
     filtered_df
     .groupby("OverTime")["AttritionFlag"]
@@ -679,8 +594,6 @@ else:
     highest_overtime = "N/A"
     highest_overtime_rate = 0
 
-
-# Income insight
 income_rates = (
     filtered_df
     .groupby("IncomeBand")["AttritionFlag"]
@@ -751,11 +664,6 @@ with insight4:
         """,
         unsafe_allow_html=True
     )
-
-
-# ============================================================
-# RECOMMENDATIONS
-# ============================================================
 
 st.subheader("🎯 Recommendations")
 
@@ -832,12 +740,6 @@ with recommendation2:
         """,
         unsafe_allow_html=True
     )
-
-
-# ============================================================
-# FOOTER / LIMITATION
-# ============================================================
-
 st.markdown("---")
 
 st.markdown(
